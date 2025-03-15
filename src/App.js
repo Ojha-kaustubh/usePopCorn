@@ -49,23 +49,26 @@ const tempWatchedData = [
 
 const average = (arr) => arr.reduce((acc, cur) => acc + cur, 0) / arr.length;
 
+// props drillings
 export default function App() {
+  const [movies, setMovies] = useState(tempMovieData);
   return (
     <>
-      <Navbar />
-      <Main />
+      <Navbar>
+        <Logo />
+        <Search />
+        <NumResults movies={movies} />
+      </Navbar>
+      
+      <Main movies={movies} />
     </>
   );
 }
 
-function Navbar() {
-  return (
-    <nav className="nav-bar">
-      <Logo />
-      <Search />
-      <NumResults />
-    </nav>
-  );
+function Navbar({ children }) {
+  return <nav className="nav-bar">
+    {children}
+  </nav>;
 }
 
 function Logo() {
@@ -90,8 +93,7 @@ function Search() {
   );
 }
 
-function NumResults() {
-  const [movies, setMovies] = useState(tempMovieData);
+function NumResults({ movies }) {
   return (
     <p className="num-results">
       Found <strong>{movies.length}</strong> results
@@ -99,16 +101,16 @@ function NumResults() {
   );
 }
 
-function Main() {
+function Main({ movies }) {
   return (
     <main className="main">
-      <ListBox />
+      <ListBox movies={movies} />
       <WatchedBox />
     </main>
   );
 }
 
-function ListBox() {
+function ListBox({ movies }) {
   const [isOpen1, setIsOpen1] = useState(true);
 
   return (
@@ -120,7 +122,7 @@ function ListBox() {
         {isOpen1 ? "-" : "+"}
       </button>
 
-      {isOpen1 && <MovieList movies={tempMovieData} />}
+      {isOpen1 && <MovieList movies={movies} />}
     </div>
   );
 }
