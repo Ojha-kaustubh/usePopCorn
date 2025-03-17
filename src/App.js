@@ -62,12 +62,21 @@ export default function App() {
       </Navbar>
 
       <Main>
-        <ListBox>
+        <ListBox element={<MovieList movies={movies} />} />
+
+        <ListBox
+          element={
+            <>
+              <WatchedBox watched={watched} />
+              <WatchedList watched={watched} />
+            </>
+          }
+        />
+        {/* <ListBox>
           <MovieList movies={movies} />
         </ListBox>
-        <WatchedBox watched={watched}/>
+        <WatchedBox watched={watched}/> */}
       </Main>
-      
     </>
   );
 }
@@ -110,7 +119,7 @@ function Main({ children }) {
   return <main className="main">{children}</main>;
 }
 
-function ListBox({ children }) {
+function ListBox({ element }) {
   const [isOpen1, setIsOpen1] = useState(true);
 
   return (
@@ -122,7 +131,7 @@ function ListBox({ children }) {
         {isOpen1 ? "-" : "+"}
       </button>
 
-      {isOpen1 && children}
+      {isOpen1 && element}
     </div>
   );
 }
