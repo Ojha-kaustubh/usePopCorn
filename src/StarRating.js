@@ -14,11 +14,10 @@ const textStyle = {
   lineHeight: "1.5",
   margin: "0",
 };
-
 export default function StarRating({ maxRating = 5 }) {
   const [rating, setRating] = useState(1);
 
-  function handleRating(rating) {
+  function handleStar(rating) {
     setRating(rating);
   }
 
@@ -26,11 +25,10 @@ export default function StarRating({ maxRating = 5 }) {
     <div style={containerStyle}>
       <div style={starContainer}>
         {Array.from({ length: maxRating }, (_, i) => (
-          <Star key={i} onClick={() => handleRating(i + 1)} 
-          full={rating >= i + 1} />
+          <Star key={i} onClick={() => handleStar(i + 1)} full={i + 1 <= rating} />
         ))}
       </div>
-      <p style={textStyle}>{rating || ""}</p>
+      <p style={textStyle}>{rating || " "} </p>
     </div>
   );
 }
@@ -43,9 +41,9 @@ const starStyle = {
   cursor: "pointer",
 };
 
-function Star({ onClick , full }) {
+function Star({ onClick, full }) {
   return (
-    <span role="button" style={starStyle} onClick={onClick}>
+    <span style={starStyle} onClick={onClick}>
       {full ? (
         <svg
           xmlns="http://www.w3.org/2000/svg"
