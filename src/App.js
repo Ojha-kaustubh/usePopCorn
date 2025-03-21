@@ -49,10 +49,17 @@ const tempWatchedData = [
 
 const average = (arr) => arr.reduce((acc, cur) => acc + cur, 0) / arr.length;
 
+const KEY = "aaa8e77";
+
 // this are the props drillings
 export default function App() {
-  const [movies, setMovies] = useState(tempMovieData);
-  const [watched, setWatched] = useState(tempWatchedData);
+  const [movies, setMovies] = useState([]);
+  const [watched, setWatched] = useState([]);
+
+  fetch(`http://www.omdbapi.com/?apikey=${KEY}&s=matrix`)
+    .then((res) => res.json())
+    .then((data) => setMovies(data.Search));
+
   return (
     <>
       <Navbar>
