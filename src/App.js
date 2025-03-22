@@ -57,9 +57,15 @@ export default function App() {
   const [watched, setWatched] = useState([]);
 
   useEffect(function () {
-    fetch(`http://www.omdbapi.com/?apikey=${KEY}&s=matrix`)
-      .then((res) => res.json())
-      .then((data) => console.log(data.Search));
+    async function fetchMovies() {
+      const res = await fetch(`http://www.omdbapi.com/?apikey=${KEY}&s=matrix`);
+      const data = await res.json();
+      setMovies(data.Search);
+      // .then((res) => res.json())
+      // .then((data) => console.log(data.Search));
+      console.log(data.Search);
+    }
+    fetchMovies();
   }, []);
 
   return (
