@@ -55,6 +55,7 @@ const KEY = "aaa8e77";
 export default function App() {
   const [movies, setMovies] = useState([]);
   const [watched, setWatched] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(function () {
     async function fetchMovies() {
@@ -64,6 +65,7 @@ export default function App() {
       // .then((res) => res.json())
       // .then((data) => console.log(data.Search));
       console.log(data.Search);
+      setIsLoading(false);
     }
     fetchMovies();
   }, []);
@@ -77,23 +79,23 @@ export default function App() {
       </Navbar>
 
       <Main>
-        <ListBox element={<MovieList movies={movies} />} />
+        <Box>
+          {isLoading ? <Loader /> : <MovieList movies={movies} />} 
+          </Box>
 
-        <ListBox
-          element={
-            <>
-              <WatchedBox watched={watched} />
-              <WatchedList watched={watched} />
-            </>
-          }
-        />
-        {/* <ListBox>
-          <MovieList movies={movies} />
-        </ListBox>
-        <WatchedBox watched={watched}/> */}
+        <Box>
+          {/* <WatchedSummary watched={watched} /> */}
+          <WatchedBox watched={watched} />
+        </Box>
       </Main>
     </>
   );
+}
+
+function Loader() {
+  return (
+    <p className="loader">Loading...</p>
+  )
 }
 
 function Navbar({ children }) {
@@ -133,20 +135,16 @@ function NumResults({ movies }) {
 function Main({ children }) {
   return <main className="main">{children}</main>;
 }
-
-function ListBox({ element }) {
-  const [isOpen1, setIsOpen1] = useState(true);
+function Box({ children }) {
+  const [isOpen, setIsOpen] = useState(true);
 
   return (
     <div className="box">
-      <button
-        className="btn-toggle"
-        onClick={() => setIsOpen1((show) => !show)}
-      >
-        {isOpen1 ? "-" : "+"}
+      <button className="btn-toggle" onClick={() => setIsOpen((show) => !show)}>
+        {isOpen ? "-" : "+"}
       </button>
 
-      {isOpen1 && element}
+      {isOpen && children}
     </div>
   );
 }
