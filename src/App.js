@@ -56,16 +56,32 @@ export default function App() {
   const [movies, setMovies] = useState([]);
   const [watched, setWatched] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, Seterror] = useState("");
 
   useEffect(function () {
     async function fetchMovies() {
-      const res = await fetch(`http://www.omdbapi.com/?apikey=${KEY}&s=matrix`);
-      const data = await res.json();
-      setMovies(data.Search);
-      // .then((res) => res.json())
-      // .then((data) => console.log(data.Search));
-      console.log(data.Search);
-      setIsLoading(false);
+      try {
+        const res = await fetch(
+          `http://www.omdbapi.com/?apikey=${KEY}&s=matrix`
+        );
+
+        if (!res.ok) throw new Error("Something went wrong");
+
+        const data = await res.json();
+        
+        if (data.Response === "False")
+          throw new Error("Sometimes wrong with movie fetching");
+
+        setMovies(data.Search);
+        // .then((res) => res.json())
+        // .then((data) => console.log(data.Search));
+        console.log(data.Search);
+      } catch (error) {
+        console.error(error.message);
+        Seterror(error.message);
+      } finally {
+        setIsLoading(false);
+      }
     }
     fetchMovies();
   }, []);
@@ -80,8 +96,12 @@ export default function App() {
 
       <Main>
         <Box>
-          {isLoading ? <Loader /> : <MovieList movies={movies} />} 
-          </Box>
+          {/* {isLoading ? <Loader /> : <MovieList movies={movies} />} */}
+
+          {isLoading && <Loader />}
+          {!isLoading && !error && <MovieList movies={movies} />}
+          {error && <ErrorMessage message={error} />}
+        </Box>
 
         <Box>
           {/* <WatchedSummary watched={watched} /> */}
@@ -93,9 +113,16 @@ export default function App() {
 }
 
 function Loader() {
+  return <p className="loader">Loading...</p>;
+}
+
+function ErrorMessage({ message }) {
   return (
-    <p className="loader">Loading...</p>
-  )
+    <p className="error">
+      <span>❌</span>
+      {message}
+    </p>
+  );
 }
 
 function Navbar({ children }) {
@@ -135,6 +162,7 @@ function NumResults({ movies }) {
 function Main({ children }) {
   return <main className="main">{children}</main>;
 }
+
 function Box({ children }) {
   const [isOpen, setIsOpen] = useState(true);
 
