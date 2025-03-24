@@ -17,15 +17,16 @@ function Test() {
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-  <React.StrictMode>
-    <App />
-    {/* <Test />
-    <StarRating
-      maxRating={5}
-      message={["Terrible ", "Bad", "Okay", "Good", "Excellent"]}
-    />
-    <StarRating size={24} color="orange" className="test" defaultRating={3} /> */}
-  </React.StrictMode>
+  // <React.StrictMode>
+  //   <App />
+  //   {/* <Test />
+  //   <StarRating
+  //     maxRating={5}
+  //     message={["Terrible ", "Bad", "Okay", "Good", "Excellent"]}
+  //   />
+  //   <StarRating size={24} color="orange" className="test" defaultRating={3} /> */}
+  // </React.StrictMode>
+  <App />
 );
 
 // If you want to start measuring performance in your app, pass a function
