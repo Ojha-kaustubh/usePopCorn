@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import StarRating from "./StarRating";
 
 const tempMovieData = [
@@ -79,25 +79,31 @@ export default function App() {
 
   useEffect(
     function () {
+      const controller = new AbortController();
+
       async function fetchMovies() {
         try {
           setIsLoading(true);
           setError("");
           const res = await fetch(
-            `http://www.omdbapi.com/?apikey=${KEY}&s=${query}`
+            `http://www.omdbapi.com/?apikey=${KEY}&s=${query}`,
+            { signal: controller.signal }
           );
           const data = await res.json();
           if (!res.ok) throw new Error("Something went wrong");
           if (data.Response === "False")
             throw new Error("Sometimes wrong with movie fetching");
-
+          console.log(data.Search);
           setMovies(data.Search);
           // .then((res) => res.json())
           // .then((data) => console.log(data.Search));
-          console.log(data.Search);
+          console.log(movies);
         } catch (error) {
           console.error(error.message);
           setError(error.message);
+          // if(error.name ! == 'AbortError') {
+          //   setError(error.message);
+          // }
         } finally {
           setIsLoading(false);
         }
@@ -108,6 +114,10 @@ export default function App() {
         return;
       }
       fetchMovies();
+
+      return function () {
+        controller.abort();
+      };
     },
     [query]
   );
@@ -273,6 +283,7 @@ function MovieDetails({ selectedId, onCloseMovies, onAddWatched, watched }) {
 
   const isWatched = watched.map((movies) => movies.imdbID).includes(selectedId);
 
+  // object destructuring without any property
   const {
     Title: title,
     Year: year,
@@ -284,8 +295,10 @@ function MovieDetails({ selectedId, onCloseMovies, onAddWatched, watched }) {
     Actors: actors,
     Director: director,
     Genre: genre,
+    // Type: type,
   } = movie;
 
+  // console.log(year , runtime, imdbRating, plot, released, actors, director, genre);
   useEffect(() => {
     async function fetchMovieDetails() {
       try {
@@ -306,6 +319,7 @@ function MovieDetails({ selectedId, onCloseMovies, onAddWatched, watched }) {
   }, [selectedId]);
 
   function handleAdd() {
+    // object destructuring with the property
     const newWatchedMovie = {
       imdbID: selectedId,
       Title: title, // Fix title casing
@@ -317,7 +331,38 @@ function MovieDetails({ selectedId, onCloseMovies, onAddWatched, watched }) {
     };
     onAddWatched(newWatchedMovie);
     onCloseMovies();
+    console.log(newWatchedMovie.imdbID);
   }
+
+  useEffect(
+    function () {
+      document.title = `Movie | ${title}`;
+
+      return function () {
+        document.title = "usePopcorn";
+      };
+    },
+    [title]
+  );
+
+  useEffect(
+    function () {
+      document.addEventListener("keydown", function (e) {
+        if (e.code === "Escape") {
+          onCloseMovies();
+        }
+      });
+
+      return function () {
+        document.removeEventListener("keydown", function (e) {
+          if (e.code === "Escape") {
+            onCloseMovies();
+          }
+        });
+      }
+    },
+    [onCloseMovies]
+  );
 
   return (
     <div className="details">
