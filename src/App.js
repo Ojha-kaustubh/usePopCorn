@@ -1,4 +1,4 @@
-import { use, useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import StarRating from "./StarRating";
 
 const tempMovieData = [
@@ -86,8 +86,7 @@ export default function App() {
           setIsLoading(true);
           setError("");
           const res = await fetch(
-            `http://www.omdbapi.com/?apikey=${KEY}&s=${query}`,
-            { signal: controller.signal }
+            `http://www.omdbapi.com/?apikey=${KEY}&s=${query}`
           );
           const data = await res.json();
           if (!res.ok) throw new Error("Something went wrong");
@@ -193,6 +192,19 @@ function Logo() {
 }
 
 function Search({ query, setQuery }) {
+  const inputEl = useRef(null);
+
+  useEffect(function () {
+    function callback(e) {
+      if (document.activeElement === inputEl.current) return;
+      if (e.code === "Enter") inputEl.current.focus();
+      setQuery("");
+    }
+
+    document.addEventListener("keydown", callback);
+    return () => document.removeEventListener("keydown", callback);
+  }, []);
+
   return (
     <input
       className="search"
@@ -200,6 +212,7 @@ function Search({ query, setQuery }) {
       placeholder="Search movies..."
       value={query}
       onChange={(e) => setQuery(e.target.value)}
+      ref={inputEl}
     />
   );
 }
@@ -283,6 +296,17 @@ function MovieDetails({ selectedId, onCloseMovies, onAddWatched, watched }) {
 
   const isWatched = watched.map((movies) => movies.imdbID).includes(selectedId);
 
+  const counterRef = useRef(0);
+  let count = 0;
+  useEffect(
+    function () {
+      // if(userRating) counterRef.current += 1;
+      if (userRating) counterRef.current++;
+      if (userRating) count++;
+    },
+    [userRating]
+  );
+
   // object destructuring without any property
   const {
     Title: title,
@@ -328,6 +352,8 @@ function MovieDetails({ selectedId, onCloseMovies, onAddWatched, watched }) {
       runtime,
       imdbRating: Number(imdbRating),
       userRating, // Set user rating default to null
+      countRating: counterRef.current,
+      count,
     };
     onAddWatched(newWatchedMovie);
     onCloseMovies();
@@ -359,7 +385,7 @@ function MovieDetails({ selectedId, onCloseMovies, onAddWatched, watched }) {
             onCloseMovies();
           }
         });
-      }
+      };
     },
     [onCloseMovies]
   );
