@@ -1,47 +1,52 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 
-const KEY = "aaa8e77";
+const KEY = "f84fc31d";
 
-export function useMovies({ query }) {
+export function useMovies(query) {
   const [movies, setMovies] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(
     function () {
+      // callback?.();
+
       const controller = new AbortController();
 
       async function fetchMovies() {
         try {
           setIsLoading(true);
           setError("");
+
           const res = await fetch(
-            `http://www.omdbapi.com/?apikey=${KEY}&s=${query}`
+            `http://www.omdbapi.com/?apikey=${KEY}&s=${query}`,
+            { signal: controller.signal }
           );
+
+          if (!res.ok)
+            throw new Error("Something went wrong with fetching movies");
+
           const data = await res.json();
-          if (!res.ok) throw new Error("Something went wrong");
-          if (data.Response === "False")
-            throw new Error("Sometimes wrong with movie fetching");
-          console.log(data.Search);
+          if (data.Response === "False") throw new Error("Movie not found");
+
           setMovies(data.Search);
-          // .then((res) => res.json())
-          // .then((data) => console.log(data.Search));
-          console.log(movies);
-        } catch (error) {
-          console.error(error.message);
-          setError(error.message);
-          // if(error.name ! == 'AbortError') {
-          //   setError(error.message);
-          // }
+          setError("");
+        } catch (err) {
+          if (err.name !== "AbortError") {
+            console.log(err.message);
+            setError(err.message);
+          }
         } finally {
           setIsLoading(false);
         }
       }
+
       if (query.length < 3) {
         setMovies([]);
         setError("");
         return;
       }
+
       fetchMovies();
 
       return function () {
@@ -50,5 +55,6 @@ export function useMovies({ query }) {
     },
     [query]
   );
+
   return { movies, isLoading, error };
 }
