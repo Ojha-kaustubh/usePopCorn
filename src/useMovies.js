@@ -11,8 +11,6 @@ export function useMovies(query) {
     function () {
       // callback?.();
 
-      const controller = new AbortController();
-
       async function fetchMovies() {
         try {
           setIsLoading(true);
@@ -20,7 +18,6 @@ export function useMovies(query) {
 
           const res = await fetch(
             `http://www.omdbapi.com/?apikey=${KEY}&s=${query}`,
-            { signal: controller.signal }
           );
 
           if (!res.ok)
@@ -46,12 +43,8 @@ export function useMovies(query) {
         setError("");
         return;
       }
-
       fetchMovies();
 
-      return function () {
-        controller.abort();
-      };
     },
     [query]
   );

@@ -243,8 +243,6 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
   //   [imdbRating]
   // );
 
-  const isTop = imdbRating > 8;
-  console.log(isTop);
 
   // const [avgRating, setAvgRating] = useState(0);
 
